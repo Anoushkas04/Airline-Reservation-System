@@ -1,29 +1,38 @@
-# Airline Reservation System (ARS)
+# Airline Reservation System
 
-A comprehensive **JavaFX-based Airline Reservation System** designed for efficient flight management and booking. This application simulates a real-world airline operations environment with features for both travellers and managers.
+A JavaFX desktop app for booking flights and managing an airline schedule. It was built to practise object-oriented design, multithreading and reactive UI in Java.
 
-## 🚀 Key Features
+**Stack:** Java · JavaFX
 
-### 👤 Traveller Portal
-*   **Interactive Booking:** Search for flights by origin, destination, or date and book seats via an interactive grid-based seat map.
-*   **Dynamic Pricing:** Implements a demand-based pricing model where seat prices increase by 10% after each successful booking.
-*   **Add-on Services:** Purchase extras like in-flight meals, Wi-Fi access, lounge entry, and extra luggage.
-*   **Automated Invoicing:** Generates detailed invoices including seat details, add-ons, and total costs.
+## Features
 
-### 🛠️ Manager Dashboard
-*   **Flight Management:** Add new flights, delete existing ones, or mark flights as departed.
-*   **Advanced Reporting:** Analyze system performance with automated reports on frequent destinations, busiest booking months, and departed flight logs.
-*   **Secure Access:** Password-protected administrative interface.
+**Traveller**
+- Search the flight schedule by origin, destination or date.
+- Book seats from a seat-map grid. Booked seats are disabled in real time.
+- Demand-based pricing: each successful booking raises that flight's seat price by 10%.
+- Add-ons: Wi-Fi, lounge access, catering and extra luggage.
+- An invoice listing booked seats, booking times, add-ons and the total cost.
 
-## 💻 Technical Highlights
-*   **Concurrency:** Utilizes Java multithreading and `synchronized` methods to handle concurrent booking requests safely, preventing race conditions.
-*   **Reactive UI:** Built with JavaFX `Properties` and `Bindings` for real-time interface updates (e.g., immediate disabling of booked seats).
-*   **Data Structures:** Custom generic `Stack` implementation used for flight logging and analytics.
-*   **Search Engine:** Advanced filtering system for flight schedules using `FilteredList`.
+**Manager** (password-protected)
+- Add and delete flights, and mark flights as departed.
+- Reports: most frequent destination, busiest departure period, and busiest booking day, month and year.
+- A searchable log of departed flights.
 
-## 🛠️ Requirements
-*   Java 8 or higher
-*   JavaFX SDK
+## Implementation notes
 
----
-*Created as part of a Cognitive Assessment project.*
+- **Concurrent bookings:** each booking request runs on its own thread, and `Seat.book()` is `synchronized`, so two travellers can't book the same seat. To show this, a second "traveller" books from the console on a separate thread while the GUI is in use. Whoever gets the seat first wins, and the other is told it's taken.
+- **Reactive UI:** seat state, booked counts and price are JavaFX properties. The seat buttons and price label are bound to them, and a custom `BooleanBinding` detects when a flight is fully booked.
+- **Search:** `FilteredList` over observable lists for the schedule and the departed-flight log.
+- **Custom data structure:** a generic `Stack<T>` holds the departed-flight log that the reports read from.
+- **Custom exception:** `AllSeatsBooked`.
+
+## Running
+
+Requires a JDK and the JavaFX SDK.
+
+```bash
+javac --module-path $PATH_TO_FX --add-modules javafx.controls Demo.java
+java  --module-path $PATH_TO_FX --add-modules javafx.controls Demo
+```
+
+All data is in memory. Flights added during a session aren't saved.
